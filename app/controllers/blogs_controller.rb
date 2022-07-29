@@ -15,10 +15,16 @@ class BlogsController < ApplicationController
     @blog = Blog.new
   end
 
-  def edit; end
+  def edit
+    if @blog.user == current_user
+      render :edit
+    else
+      redirect_to :blogs
+    end
+  end
 
   def create
-    @blog = current_user.blogs.new(blog_params)
+    @blog = blogs.new(blog_params)
 
     if @blog.save
       redirect_to blog_url(@blog), notice: 'Blog was successfully created.'
