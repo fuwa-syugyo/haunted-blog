@@ -10,9 +10,6 @@ class BlogsController < ApplicationController
   end
 
   def show
-    if @blog.secret && current_user != @blog.user
-      redirect_to :blogs
-    end
   end
 
   def new
@@ -20,15 +17,13 @@ class BlogsController < ApplicationController
   end
 
   def edit
-    if @blog.user == current_user
-      render :edit
-    else
-      redirect_to :blogs
-    end
+    # if @blog.user != current_user
+    #   notice: '他の人のブログは編集できません'
+    # end
   end
 
   def create
-    @blog = blogs.new(blog_params)
+    @blog = current_user.blogs.new(blog_params)
 
     if @blog.save
       redirect_to blog_url(@blog), notice: 'Blog was successfully created.'
@@ -38,7 +33,7 @@ class BlogsController < ApplicationController
   end
 
   def update
-    if @blog.update(blog_params)
+    if @blog.update(blog_params) && @blog.user == current_user
       redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
@@ -46,15 +41,22 @@ class BlogsController < ApplicationController
   end
 
   def destroy
-    @blog.destroy!
-
-    redirect_to blogs_url, notice: 'Blog was successfully destroyed.', status: :see_other
+    if @blog.user == current_user
+      @blog.destroy!
+      redirect_to blogs_url, notice: 'Blog was successfully destroyed.', status: :see_other
+    # else
+    #   # notice: '他の人のブログは削除できません'
+    end
   end
 
   private
 
   def set_blog
-    @blog = Blog.find(params[:id])
+    if current_user.nil?
+      @blog = Blog.where(secret: false).find(params[:id])
+    else
+      @blog = Blog.find(params[:id]).secret ? current_user.blogs.find(params[:id]) : Blog.find(params[:id])
+    end
   end
 
   def blog_params
