@@ -17,9 +17,10 @@ class BlogsController < ApplicationController
   end
 
   def edit
-    # if @blog.user != current_user
-    #   notice: '他の人のブログは編集できません'
-    # end
+    if @blog.user != current_user
+      @blog = Blog.find(params[:id] == nil)
+      # raise ActiveRecord::RecordNotFound
+    end
   end
 
   def create
@@ -33,7 +34,7 @@ class BlogsController < ApplicationController
   end
 
   def update
-    if @blog.update(blog_params) && @blog.user == current_user
+    if @blog.update(blog_params)
       redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
@@ -44,8 +45,8 @@ class BlogsController < ApplicationController
     if @blog.user == current_user
       @blog.destroy!
       redirect_to blogs_url, notice: 'Blog was successfully destroyed.', status: :see_other
-    # else
-    #   # notice: '他の人のブログは削除できません'
+    else
+      raise ActiveRecord::RecordNotFound
     end
   end
 
