@@ -9,17 +9,14 @@ class BlogsController < ApplicationController
     @blogs = Blog.search(params[:term]).published.default_order
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @blog = Blog.new
   end
 
   def edit
-    if @blog.user != current_user
-      raise ActiveRecord::RecordNotFound
-    end
+    raise ActiveRecord::RecordNotFound if @blog.user != current_user
   end
 
   def create
@@ -33,31 +30,26 @@ class BlogsController < ApplicationController
   end
 
   def update
-    if @blog.update(blog_params) && @blog.user == current_user
-      redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
-    else
-      raise ActiveRecord::RecordNotFound
-      render :edit, status: :unprocessable_entity
-    end
+    raise ActiveRecord::RecordNotFound unless @blog.update(blog_params) && @blog.user == current_user
+
+    redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
   end
 
   def destroy
-    if @blog.user == current_user
-      @blog.destroy!
-      redirect_to blogs_url, notice: 'Blog was successfully destroyed.', status: :see_other
-    else
-      raise ActiveRecord::RecordNotFound
-    end
+    raise ActiveRecord::RecordNotFound unless @blog.user == current_user
+
+    @blog.destroy!
+    redirect_to blogs_url, notice: 'Blog was successfully destroyed.', status: :see_other
   end
 
   private
 
   def set_blog
-    if current_user.nil?
-      @blog = Blog.where(secret: false).find(params[:id])
-    else
-      @blog = Blog.find(params[:id]).secret ? current_user.blogs.find(params[:id]) : Blog.find(params[:id])
-    end
+    @blog = if current_user.nil?
+              Blog.where(secret: false).find(params[:id])
+            else
+              Blog.find(params[:id]).secret ? current_user.blogs.find(params[:id]) : Blog.find(params[:id])
+            end
   end
 
   def blog_params
