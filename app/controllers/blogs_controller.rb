@@ -18,8 +18,7 @@ class BlogsController < ApplicationController
 
   def edit
     if @blog.user != current_user
-      @blog = Blog.find(params[:id] == nil)
-      # raise ActiveRecord::RecordNotFound
+      raise ActiveRecord::RecordNotFound
     end
   end
 
@@ -34,9 +33,10 @@ class BlogsController < ApplicationController
   end
 
   def update
-    if @blog.update(blog_params)
+    if @blog.update(blog_params) && @blog.user == current_user
       redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
     else
+      raise ActiveRecord::RecordNotFound
       render :edit, status: :unprocessable_entity
     end
   end
