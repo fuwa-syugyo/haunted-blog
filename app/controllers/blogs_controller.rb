@@ -16,7 +16,7 @@ class BlogsController < ApplicationController
   end
 
   def edit
-    raise ActiveRecord::RecordNotFound if @blog.user != current_user
+    @blog = current_user.blogs.find(params[:id])
   end
 
   def create
