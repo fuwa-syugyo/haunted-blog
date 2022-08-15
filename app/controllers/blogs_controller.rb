@@ -48,7 +48,7 @@ class BlogsController < ApplicationController
     @blog = if current_user.nil?
               Blog.published.find(params[:id])
             else
-              !Blog.published.find(params[:id]) ? current_user.blogs.find(params[:id]) : Blog.find(params[:id])
+              Blog.find(params[:id]).secret ? current_user.blogs.find(params[:id]) : Blog.find(params[:id])
             end
   end
 
