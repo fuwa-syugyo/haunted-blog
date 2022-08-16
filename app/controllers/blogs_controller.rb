@@ -45,11 +45,11 @@ class BlogsController < ApplicationController
   private
 
   def set_blog
-    @blog = if current_user.nil?
-              Blog.published.find(params[:id])
-            else
-              Blog.find(params[:id]).secret ? current_user.blogs.find(params[:id]) : Blog.find(params[:id])
-            end
+    @blog = Blog.find(params[:id])
+
+    if @blog.secret == true && (current_user.nil? || @blog.user != current_user)
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def blog_params
