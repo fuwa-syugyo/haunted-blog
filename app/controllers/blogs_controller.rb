@@ -10,8 +10,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    @blog = Blog.find(params[:id])
-    raise ActiveRecord::RecordNotFound if @blog.secret == true && (current_user.nil? || @blog.user != current_user)
+    @blog = Blog.exclude_other_users_secret(current_user).find(params[:id])
   end
 
   def new
