@@ -31,9 +31,11 @@ class BlogsController < ApplicationController
   end
 
   def update
-    render :edit, status: :unprocessable_entity unless @blog.update(blog_params)
-
-    redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
+    if @blog.update(blog_params)
+      redirect_to blog_url(@blog), notice: 'Blog was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def destroy
@@ -49,9 +51,7 @@ class BlogsController < ApplicationController
 
   def blog_params
     params_all_user = :title, :content, :secret
-    if current_user.premium?
-      params_all_user.push(:random_eyecatch)
-    end
+    params_all_user.push(:random_eyecatch) if current_user.premium?
     params.require(:blog).permit(params_all_user)
   end
 end
