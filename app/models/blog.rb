@@ -15,7 +15,7 @@ class Blog < ApplicationRecord
 
   scope :default_order, -> { order(id: :desc) }
 
-  scope :exclude_other_users_secret, lambda { |current_user|
+  scope :accessible_to, lambda { |current_user|
     if current_user.nil?
       published
     else

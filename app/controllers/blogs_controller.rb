@@ -10,7 +10,7 @@ class BlogsController < ApplicationController
   end
 
   def show
-    @blog = Blog.exclude_other_users_secret(current_user).find(params[:id])
+    @blog = Blog.accessible_to(current_user).find(params[:id])
   end
 
   def new
